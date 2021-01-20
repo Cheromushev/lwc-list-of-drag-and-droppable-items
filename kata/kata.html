@@ -1,8 +1,8 @@
 <template>
     <lightning-card title="Kata from Ihor Horchynskyi" icon-name="utility:drag_and_drop">
-        <div class="slds-m-around_medium">
-            <c-list-of-drag-and-droppable-items name="fist-dropdown_list" label="First Dropdown List"></c-list-of-drag-and-droppable-items>
-            <c-list-of-drag-and-droppable-items name="second-dropdown_list" label="Second Dropdown List"></c-list-of-drag-and-droppable-items>
+        <div class="slds-m-around_medium slds-grid slds-grid_align-center">
+            <c-list-of-drag-and-droppable-items label="First List" items={firstItemsArray}></c-list-of-drag-and-droppable-items>
+            <c-list-of-drag-and-droppable-items label="Second List" items={secondItemsArray}></c-list-of-drag-and-droppable-items>
         </div>   
     </lightning-card>
 </template>
