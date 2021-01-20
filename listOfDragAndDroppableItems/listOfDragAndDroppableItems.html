@@ -1,9 +1,9 @@
 <template>
     <div class="slds-col slds-m-around_medium">
         <p class="slds-text-heading_medium slds-m-around_small">{label}</p>
-        <ul class="slds-m-around_medium">
+        <ul class="slds-m-around_medium" ondragover={handleDragOver} ondrop={handleDrop}>
             <template for:each={items} for:item="item">
-                <li key={item.guid} class="slds-m-bottom_small">{item.value}</li>
+                <li key={item.guid} data-item={item.guid} class="slds-m-bottom_small" draggable="true" ondragstart={handleDragStart}>{item.value}</li>
             </template>
         </ul>
     </div>
