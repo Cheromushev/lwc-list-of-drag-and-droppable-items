@@ -87,6 +87,10 @@ export default class ListOfDragAndDroppableItems extends LightningElement {
 
     }
 
+    handleClick(event) {
+        this.listElements = this.listElements.filter(({guid}) => guid != event.target.dataset.item);
+    }
+
     disconnectedCallback() { 
         releaseMessageContext(this.messageContext); 
     }
