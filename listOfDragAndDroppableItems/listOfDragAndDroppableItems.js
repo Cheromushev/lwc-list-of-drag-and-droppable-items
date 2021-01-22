@@ -11,6 +11,8 @@ export default class ListOfDragAndDroppableItems extends LightningElement {
     dragAndDroppedItemGuid; 
     dragAndDroppedItemValue;
 
+    isItemHome = false;
+
     constructor() {
 
         super();
@@ -20,17 +22,21 @@ export default class ListOfDragAndDroppableItems extends LightningElement {
         } 
         this.subscription = subscribe(this.messageContext, DragAndDropMessageChannel, (dragAndDropMessage) => {
 
-            if (
-                !dragAndDropMessage.isItemUpcomingToBeDropped && 
-                this.guid !== dragAndDropMessage.listGuid // a little duck tape here
-            ) {
+            if (!dragAndDropMessage.isItemUpcomingToBeDropped) {
 
-                this.listElements = this.listElements.filter(({guid}) => guid != dragAndDropMessage.itemGuid);
+                this.isItemHome = false;
 
-            } 
-            else {
-                this.dragAndDroppedItemGuid = dragAndDropMessage.itemGuid; 
-                this.dragAndDroppedItemValue = dragAndDropMessage.itemValue; 
+                if (this.guid !== dragAndDropMessage.listGuid) { // a little duck tape here
+                    this.listElements = this.listElements.filter(({guid}) => guid != dragAndDropMessage.itemGuid); 
+                }
+
+            } else { 
+                if (this.guid === dragAndDropMessage.listGuid) { // a little duck tape here
+                    this.isItemHome = true; 
+                } else { 
+                    this.dragAndDroppedItemGuid = dragAndDropMessage.itemGuid; 
+                    this.dragAndDroppedItemValue = dragAndDropMessage.itemValue; 
+                } 
             } 
         }); 
     }
@@ -53,6 +59,7 @@ export default class ListOfDragAndDroppableItems extends LightningElement {
 
     handleDragStart(event) { 
         const dragAndDropMessage = { 
+            listGuid: this.guid, 
             itemGuid: event.target.dataset.item, 
             itemValue: event.target.innerText, 
             isItemUpcomingToBeDropped: true
@@ -60,21 +67,22 @@ export default class ListOfDragAndDroppableItems extends LightningElement {
         publish(this.messageContext, DragAndDropMessageChannel, dragAndDropMessage); 
     } 
     handleDragOver(event) { 
-        event.preventDefault(); 
+        if (!this.isItemHome) { 
+            event.preventDefault(); 
+        } 
     } 
     handleDrop(event) {
-        console.log("handleDrop() is being executed"); 
-        event.preventDefault(); 
-        console.log("listElements before an adding of a dropped item: " + JSON.stringify(this.listElements)); 
+
+        event.preventDefault();
+
         this.listElements = [...this.listElements, {guid: this.dragAndDroppedItemGuid, value: this.dragAndDroppedItemValue}];
-        console.log("listElements after the adding of the dropped item: " + JSON.stringify(this.listElements)); 
+
         const dragAndDropMessage = { 
             listGuid: this.guid, 
             itemGuid: this.dragAndDroppedItemGuid, 
             itemValue: null, 
             isItemUpcomingToBeDropped: false 
         }; 
-        console.log("dragAndDropMessage in drop handling: " + JSON.stringify(dragAndDropMessage)); 
         publish(this.messageContext, DragAndDropMessageChannel, dragAndDropMessage);
 
     }
